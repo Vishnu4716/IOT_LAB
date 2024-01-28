@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        center {
+            color: #2c3e50;
+        }
+
+        h1 {
+            margin: 0;
+        }
+
+        a:hover {
+            border-bottom: 2px solid #333;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            /* Wet Asphalt Label Color */
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: #fff;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button[type="reset"] {
+            background-color: #f44336;
+        }
+
+        #parkingCost {
+            color: #3498db;
+            /* Dodger Blue Text for Parking Cost */
+        }
+    </style>
+</head>
+
+<body>
+    <center>
+        <h1>Smart Parking System</h1>
+        <a href="https://hydmetrosite.wordpress.com/passenger-info/parking-charges/">Check Parking Rates</a>
+    </center>
+
+    <center>
+        <form id="parkingForm" method="post" action="/{{url}}">
+            <label for="fname">Owner Name:</label>
+            <input type="text" id="Owner Name" name="Owner Name" required>
+
+            <label for="reg">Vehicle Number:</label>
+            <input type="text" id="Vehicle Number" name="Vehicle Number" required>
+
+            <label for="topic">License Number:</label>
+            <input type="text" id="License Number" name="License Number" required>
+
+            <label for="slot">Parking Slot:</label>
+            <input type="text" id="Parking Slot" name="Parking Slot" required>
+
+            <label for="arrivalTime">Arrival Time (24hr format HH:mm):</label>
+            <input type="text" id="arrivalTime" name="arrivalTime" pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$" placeholder="HH:mm" required>
+
+            <label for="exitTime">Exit Time (24hr format HH:mm):</label>
+            <input type="text" id="exitTime" name="exitTime" pattern="^([01]?[0-9]|2[0-3]):[0-5][0-9]$" placeholder="HH:mm" required>
+
+            <label for="parkingCost">Parking Cost:</label>
+            <input type="text" id="parkingCost" name="parkingCost" readonly>
+
+            <button type="submit" onclick="calculateParkingCost()">Calculate Parking Cost</button>
+            <button type="reset">Reset</button>
+        </form>
+    </center>
+
+    <script>
+        function calculateParkingCost() {
+            var arrivalTimeStr = document.getElementById('arrivalTime').value;
+            var exitTimeStr = document.getElementById('exitTime').value;
+
+            var arrivalTime = new Date("2000-01-01T" + arrivalTimeStr + ":00");
+            var exitTime = new Date("2000-01-01T" + exitTimeStr + ":00");
+
+            var timeDifference = Math.abs(exitTime - arrivalTime);
+            var hoursDifference = timeDifference / (1000 * 60 * 60);
+
+            var twoWheelerRate = { upto2hrs: 5, additionalHours: 2 };
+            var fourWheelerRate = { upto2hrs: 10, additionalHours: 5 };
+
+            var vehicleType = "car"; // You can modify this based on your form input
+            var parkingCost = (vehicleType === 'bike') ? calculateCost(hoursDifference, twoWheelerRate) : calculateCost(hoursDifference, fourWheelerRate);
+
+            document.getElementById('parkingCost').value = parkingCost.toFixed(2);
+        }
+
+        function calculateCost(hours, rate) {
+            if (hours <= 2) {
+                return rate.upto2hrs;
+            } else {
+                return rate.upto2hrs + rate.additionalHours * (hours - 2);
+            }
+        }
+    </script>
+</body>
+
+</html>
